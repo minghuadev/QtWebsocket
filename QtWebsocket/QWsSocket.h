@@ -91,6 +91,7 @@ public:
 public slots:
 	void connectToHost( const QString & hostName, quint16 port, OpenMode mode = ReadWrite );
 	void connectToHost( const QHostAddress & address, quint16 port, OpenMode mode = ReadWrite );
+	void connectToHost( const QUrl& address, OpenMode mode = ReadWrite );
 	void disconnectFromHost();
 	void abort( QString reason = QString() );
 	void ping();

@@ -2,6 +2,7 @@
 
 #include <QCryptographicHash>
 #include <QtEndian>
+#include <QUrl>
 
 #include "QWsServer.h"
 
@@ -67,6 +68,23 @@ void QWsSocket::connectToHost( const QHostAddress &address, quint16 port, OpenMo
 	setPeerPort( port );
 	setOpenMode( mode );
 	tcpSocket->connectToHost( address, port, mode );
+}
+
+void QWsSocket::connectToHost(const QUrl &address, QIODevice::OpenMode mode) {
+	handshakeResponse.clear();
+	if (address.port() < 0) {
+		if (address.scheme() == "ws") {
+			setPeerPort(80);
+		} else if (address.scheme() == "wss") {
+			setPeerPort(443);
+		}
+	} else {
+		setPeerPort(address.port());
+	}
+	setPeerAddress( QHostAddress(address.host()) );
+	setResourceName( address.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority) );
+	setOpenMode( mode );
+	tcpSocket->connectToHost( address.host(), peerPort(), mode );
 }
 
 void QWsSocket::disconnectFromHost()
@@ -522,7 +540,7 @@ void QWsSocket::processTcpStateChanged( QAbstractSocket::SocketState tcpSocketSt
 			if ( wsSocketState == QAbstractSocket::ConnectingState )
 			{
 				key = QWsServer::generateNonce();
-				QString handshake = composeOpeningHandShake( QLatin1String("/"), QLatin1String("example.com"), QString(), QString(), key );
+				QString handshake = composeOpeningHandShake( _resourceName, peerAddress().toString(), QString(), QString(), key );
 				tcpSocket->write( handshake.toUtf8() );
 			}
 			break;
