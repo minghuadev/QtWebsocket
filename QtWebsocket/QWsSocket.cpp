@@ -2,6 +2,7 @@
 
 #include <QCryptographicHash>
 #include <QtEndian>
+#include <QUrl>
 
 #include "QWsServer.h"
 
@@ -67,6 +68,23 @@ void QWsSocket::connectToHost( const QHostAddress &address, quint16 port, OpenMo
 	setPeerPort( port );
 	setOpenMode( mode );
 	tcpSocket->connectToHost( address, port, mode );
+}
+
+void QWsSocket::connectToHost(const QUrl &address, QIODevice::OpenMode mode) {
+	handshakeResponse.clear();
+	if (address.port() < 0) {
+		if (address.scheme() == "ws") {
+			setPeerPort(80);
+		} else if (address.scheme() == "wss") {
+			setPeerPort(443);
+		}
+	} else {
+		setPeerPort(address.port());
+	}
+	setPeerAddress( QHostAddress(address.host()) );
+	setResourceName( address.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority) );
+	setOpenMode( mode );
+	tcpSocket->connectToHost( address.host(), peerPort(), mode );
 }
 
 void QWsSocket::disconnectFromHost()
@@ -177,7 +195,7 @@ qint64 QWsSocket::write( const QString & string )
 		return QWsSocket::write( string.toUtf8() );
 	}
 
-	const QList<QByteArray>& framesList = QWsSocket::composeFrames( string.toUtf8(), false, maxBytesPerFrame );
+	const QList<QByteArray>& framesList = QWsSocket::composeFrames( string.toUtf8(), false, maxBytesPerFrame, serverSideSocket );
 	return writeFrames( framesList );
 }
 
@@ -192,7 +210,7 @@ qint64 QWsSocket::write( const QByteArray & byteArray )
 		return writeFrame( BA );
 	}
 
-	const QList<QByteArray>& framesList = QWsSocket::composeFrames( byteArray, true, maxBytesPerFrame );
+	const QList<QByteArray>& framesList = QWsSocket::composeFrames( byteArray, true, maxBytesPerFrame, serverSideSocket );
 
 	qint64 nbBytesWritten = writeFrames( framesList );
 	emit bytesWritten( nbBytesWritten );
@@ -522,7 +540,7 @@ void QWsSocket::processTcpStateChanged( QAbstractSocket::SocketState tcpSocketSt
 			if ( wsSocketState == QAbstractSocket::ConnectingState )
 			{
 				key = QWsServer::generateNonce();
-				QString handshake = composeOpeningHandShake( QLatin1String("/"), QLatin1String("example.com"), QString(), QString(), key );
+				QString handshake = composeOpeningHandShake( _resourceName, peerAddress().toString(), QString(), QString(), key );
 				tcpSocket->write( handshake.toUtf8() );
 			}
 			break;
@@ -587,7 +605,7 @@ QByteArray QWsSocket::mask( QByteArray & data, QByteArray & maskingKey )
 	return result;
 }
 
-QList<QByteArray> QWsSocket::composeFrames( QByteArray byteArray, bool asBinary, int maxFrameBytes )
+QList<QByteArray> QWsSocket::composeFrames( QByteArray byteArray, bool asBinary, int maxFrameBytes, bool serverSideSocket )
 {
 	if ( maxFrameBytes == 0 )
 		maxFrameBytes = maxBytesPerFrame;
@@ -595,6 +613,9 @@ QList<QByteArray> QWsSocket::composeFrames( QByteArray byteArray, bool asBinary,
 	QList<QByteArray> framesList;
 
 	QByteArray maskingKey;
+	if (!serverSideSocket) {
+		maskingKey = generateMaskingKey();
+	}
 
 	int nbFrames = byteArray.size() / maxFrameBytes + 1;
 
@@ -625,8 +646,10 @@ QList<QByteArray> QWsSocket::composeFrames( QByteArray byteArray, bool asBinary,
 		// Application Data
 		QByteArray dataForThisFrame = byteArray.left( size );
 		byteArray.remove( 0, size );
-		
-		//dataForThisFrame = QWsSocket::mask( dataForThisFrame, maskingKey );
+
+		if (!serverSideSocket) {
+			dataForThisFrame = QWsSocket::mask( dataForThisFrame, maskingKey );
+		}
 		BA.append( dataForThisFrame );
 		
 		framesList << BA;
