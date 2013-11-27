@@ -717,7 +717,7 @@ void QWsSocket::startHandshake()
 	if (_version == WS_V13)
 	{
 		key = QWsSocket::generateNonce();
-		QString handshake = composeOpeningHandShakeV13("/", _host, key);
+        QString handshake = composeOpeningHandShakeV13(_resourceName, _host, key, _origin, _extensions);
 		tcpSocket->write(handshake.toUtf8());
 	}
 	else if (_version == WS_V0)
