@@ -73,7 +73,12 @@ QWsSocket::~QWsSocket()
 		QAbstractSocket::setSocketState(QAbstractSocket::UnconnectedState);
 		QAbstractSocket::stateChanged(QAbstractSocket::UnconnectedState);
 		emit QAbstractSocket::disconnected();
-	}
+    }
+}
+
+bool QWsSocket::waitForConnected(int msecs)
+{
+    return tcpSocket->waitForConnected(msecs);
 }
 
 void QWsSocket::initTcpSocket()

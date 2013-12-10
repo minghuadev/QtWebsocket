@@ -48,6 +48,8 @@ public:
 	// dtor
 	virtual ~QWsSocket();
 
+    virtual bool waitForConnected(int msecs = 30000);
+
 	// Public methods
 	EWebsocketVersion version();
 	QString resourceName();
