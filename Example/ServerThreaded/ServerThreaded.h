@@ -32,7 +32,7 @@ class ServerThreaded : public QObject
 	Q_OBJECT
 
 public:
-	ServerThreaded();
+    ServerThreaded(int portnr);
 	~ServerThreaded();
 
 public slots:

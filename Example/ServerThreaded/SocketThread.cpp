@@ -42,7 +42,7 @@ SocketThread::~SocketThread()
 
 void SocketThread::run()
 {
-	std::cout << tr("connect done in thread : 0x%1").arg(QString::number((unsigned int)QThread::currentThreadId(), 16)).toStdString() << std::endl;
+    std::cout << tr("connect done in thread : 0x%1").arg(QString::number((unsigned long)QThread::currentThreadId(), 16)).toStdString() << std::endl;
 
 	// Connecting the socket signals here to exec the slots in the new thread
 	QObject::connect(socket, SIGNAL(frameReceived(QString)), this, SLOT(processMessage(QString)));
@@ -64,7 +64,7 @@ void SocketThread::processMessage(QString message)
 {
 	// ANY PROCESS HERE IS DONE IN THE SOCKET THREAD !
 
-	std::cout << tr("thread 0x%1 | %2").arg(QString::number((unsigned int)QThread::currentThreadId(), 16)).arg(message).toStdString() << std::endl;
+    std::cout << tr("thread 0x%1 | %2").arg(QString::number((unsigned long)QThread::currentThreadId(), 16)).arg(message).toStdString() << std::endl;
 }
 
 void SocketThread::sendMessage(QString message)

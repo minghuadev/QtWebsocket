@@ -17,17 +17,33 @@ You should have received a copy of the GNU Lesser General Public License
 along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ServerThreaded.h"
+#ifndef SERVER_H
+#define SERVER_H
+
 #include <QtCore>
-#include <iostream>
+#include <QtNetwork>
 
-int main(int argc, char *argv[])
+#include "QWsServer.h"
+#include "QWsSocket.h"
+
+class Server : public QObject
 {
-	QCoreApplication app(argc, argv);
+	Q_OBJECT
 
-    std::cout << QObject::tr("main thread : 0x%1").arg(QString::number((unsigned long)QThread::currentThreadId(), 16)).toStdString() << std::endl;
+public:
+	Server(int port = 80, QtWebsocket::Protocol protocol = QtWebsocket::Tcp);
+	~Server();
 
-    ServerThreaded myThreadedServer(1888);
+public slots:
+	void processNewConnection();
+    void sendToClients(QString s);
+	void processMessage(QString message);
+	void processPong(quint64 elapsedTime);
+	void socketDisconnected();
 
-	return app.exec();
-}
+private:
+	QtWebsocket::QWsServer* server;
+	QList<QtWebsocket::QWsSocket*> clients;
+};
+
+#endif // SERVER_H

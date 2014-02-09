@@ -20,9 +20,9 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #include "ServerThreaded.h"
 #include <iostream>
 
-ServerThreaded::ServerThreaded()
+ServerThreaded::ServerThreaded(int portnr)
 {
-	int port = 80;
+    int port = portnr;
 	server = new QtWebsocket::QWsServer(this);
 	if (! server->listen(QHostAddress::Any, port))
 	{

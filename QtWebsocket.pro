@@ -2,10 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     QtWebsocket \
-    Example/Client \
-    Example/Server \
-    Example/ServerThreaded \
-    AutobahnTestSuite
+    InfoposterDemo
 
 Client.depends = QtWebsocket
 Server.depends = QtWebsocket
