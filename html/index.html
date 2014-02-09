@@ -1,0 +1,58 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Websocket client test</title>
+<meta charset="utf-8">
+<script src="jquery-2.1.0.js"> </script>
+<script src="main.js"> </script>
+
+<script type='text/javascript'>
+$(document).ready( function() {
+	var socket = new WebSocket("ws://localhost:1888");
+	socket.onopen=function() {
+		console.log("socket opened");
+	}
+	socket.onclose=function() {
+		window.open('', '_self', ''); 
+		window.close();
+
+	};
+	socket.onerror= function(e) {
+		console.log(e);
+	};
+	socket.onmessage=function(message) {
+		var c = $.parseJSON(message.data);
+		if ( c.cmd !== undefined && c.cmd !== "") {
+			eval(c.cmd);
+		}
+	}
+
+
+});
+
+</script>
+<style type='text/css'>
+div {
+	opacity: 1;
+	transition: opacity .5s ease-in-out;
+	-webkit-transition: opacity .5s ease-in-out;
+}
+.hidden {
+	opacity: 0 !important;
+}
+
+.big {
+	font-size: large;
+}
+
+</style>
+
+</head>
+<body>
+<div class='hidden big' >Big Text </div>
+
+
+	
+</body>

@@ -14,7 +14,6 @@ bool EventFilter::eventFilter(QObject *, QEvent *event) {
     if ( event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
         if ( ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Return) {
-            qDebug() << "yo";
             doSend->animateClick();
             ret_val= true;
         }
