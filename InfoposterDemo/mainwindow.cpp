@@ -30,12 +30,13 @@ void MainWindow::on_sendToBrowser_clicked()
      * no other parameters currently being used
      */
     QJsonObject json;
-    json.insert("cmd", ui->toBrowser->toPlainText().trimmed());
+    QString cmd = ui->toBrowser->toPlainText().trimmed();
+    json.insert("cmd", cmd);
 
     QString s = (new QJsonDocument(json))->toJson();
 
     myServer->sendToClients(s);
-    ui->logWindow->appendPlainText(s);
+    ui->logWindow->appendPlainText(cmd);
     ui->toBrowser->clear();
     ui->toBrowser->setFocus();
 }
