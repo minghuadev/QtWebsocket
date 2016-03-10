@@ -1,0 +1,72 @@
+
+open issues
+2016-3-10
+
+
+===========================================================
+ #3
+ Safari don't send closing handshake #3
+ antlafarge opened this Issue on Aug 19, 2012 · 1 comment
+
+----
+ antlafarge commented on Aug 19, 2012
+
+Safari 5.1.7 (that uses websocket protocol version 00) don't send the closing handshake frame when it disconnect
+
+----
+ antlafarge commented on Sep 20, 2012
+
+http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00#section-1.4
+
+If I properly understood, safari should send a close frame as acknowledgement...
+
+
+===========================================================
+ #19
+ GET HTTP Request bug with websocket.org echo server #19
+ antlafarge opened this Issue on Aug 26, 2013 · 0 comments
+
+----
+ antlafarge commented on Aug 26, 2013
+
+I can connect to the echo server of websocket.org when I put "/" as resourceName but I receive a HTTP response "404 not found" when I put "ws://echo.websocket.org/" as resourceName...
+Thats strange because I can connect with my javascript example to the echo server and the resourceName is "ws://echo.websocket.org/".
+
+GET ws://echo.websocket.org/ HTTP/1.1
+Host: echo.websocket.org
+Sec-WebSocket-Key: MNa2H8RrFoncCGD9zCPw5A==
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Version: 13
+
+
+===========================================================
+ #28
+ Discrepancy in QtWebSocket QWsSocket class with accepted standards #28
+ Andrew9Pt opened this Issue on Feb 27, 2014 · 1 comment
+
+----
+ Andrew9Pt commented on Feb 27, 2014
+
+When using QWsSocket as a client, the URI that you would want encoded in the initial handshake's GET field is a static '/', preventing access to other resources from the server.
+
+QWsSocket.cpp:720 QString handshake = composeOpeningHandShakeV13("/", _host, key);
+
+QWsSocket.cpp:728 QString handshake = composeOpeningHandShakeV0("/", _host, key1, key2, key3);
+
+Ideally these would be set to the '_resourceName' property instead of a static "/"
+
+References:
+
+http://tools.ietf.org/html/rfc6455#section-1.3
+http://tools.ietf.org/html/rfc2616#section-9.3
+
+----
+ antlafarge commented on Oct 3, 2014
+
+Hello Andrew, I know but look at this issue.
+#19
+
+That's why I put a static "/" to the resource name...
+
+
